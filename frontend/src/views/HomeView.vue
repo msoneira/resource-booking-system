@@ -60,7 +60,6 @@ onMounted(loadResources)
       <p class="nav-label">WORKSPACE</p>
       <nav>
         <RouterLink class="nav-item active" to="/">Resources</RouterLink>
-        <RouterLink class="nav-item" to="/availability">Availability</RouterLink>
         <RouterLink class="nav-item"  to="/my-bookings">My bookings</RouterLink>
       </nav>
 
