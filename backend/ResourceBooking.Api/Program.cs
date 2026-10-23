@@ -9,8 +9,16 @@ var connectionString =
     ?? throw new InvalidOperationException(
         "Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<BookingDbContext>(options =>
-    options.UseNpgsql(connectionString));
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<BookingDbContext>(options =>
+        options.UseSqlite("Data Source=resource-booking-tests.db"));
+}
+else
+{
+    builder.Services.AddDbContext<BookingDbContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 
 builder.Services.AddOpenApi();
 
@@ -29,12 +37,15 @@ var app = builder.Build();
 
 app.UseCors("VueFrontend");
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
+    using var scope = app.Services.CreateScope();
+
     var db = scope.ServiceProvider
         .GetRequiredService<BookingDbContext>();
 
     await DbInitializer.SeedAsync(db);
+
 }
 
 if (app.Environment.IsDevelopment())
@@ -317,3 +328,5 @@ app.MapGet("/api/resources/{resourceId:int}/bookings", async (
 .WithSummary("Returns confirmed bookings for a resource on a local office date");
 
 app.Run();
+
+public partial class Program { }
